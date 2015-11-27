@@ -3,37 +3,25 @@ package uk.co.deanwild.materialshowcaseview;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Point;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
+import android.graphics.*;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
+import android.view.*;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import uk.co.deanwild.materialshowcaseview.shape.CircleShape;
 import uk.co.deanwild.materialshowcaseview.shape.NoShape;
 import uk.co.deanwild.materialshowcaseview.shape.RectangleShape;
 import uk.co.deanwild.materialshowcaseview.shape.Shape;
 import uk.co.deanwild.materialshowcaseview.target.Target;
 import uk.co.deanwild.materialshowcaseview.target.ViewTarget;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -59,6 +47,8 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     private int mGravity;
     private int mContentBottomMargin;
     private int mContentTopMargin;
+    private boolean mKeepContentTop;
+    private boolean mKeepContentBottom;
     private boolean mDismissOnTouch = false;
     private boolean mShouldRender = false; // flag to decide when we should actually render
     private int mMaskColour;
@@ -280,7 +270,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
                 radius = mShape.getHeight() / 2;
             }
 
-            if (yPos > midPoint) {
+            if ((yPos > midPoint || mKeepContentTop) && !mKeepContentBottom) {
                 // target is in lower half of screen, we'll sit above it
                 mContentTopMargin = 0;
                 mContentBottomMargin = (height - yPos) + radius + mShapePadding;
@@ -363,6 +353,20 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         if (mDismissButton != null) {
             mDismissButton.setTextColor(textColour);
         }
+    }
+
+    private void setDismissBackground(Drawable background) {
+        if (mDismissButton != null) {
+            mDismissButton.setBackgroundDrawable(background);
+        }
+    }
+
+    private void setKeepContentTop(boolean keepContentTop) {
+        this.mKeepContentTop = keepContentTop;
+    }
+
+    private void setKeepContentBottom(boolean keepContentBottom) {
+        this.mKeepContentBottom = keepContentBottom;
     }
 
     private void setShapePadding(int padding) {
@@ -527,6 +531,11 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
             return this;
         }
 
+        public Builder setDismissBackground(Drawable background) {
+            showcaseView.setDismissBackground(background);
+            return this;
+        }
+
         public Builder setDelay(int delayInMillis) {
             showcaseView.setDelay(delayInMillis);
             return this;
@@ -564,6 +573,18 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
 
         public Builder setShapePadding(int padding) {
             showcaseView.setShapePadding(padding);
+            return this;
+        }
+
+        public Builder keepContentTop() {
+            showcaseView.setKeepContentTop(true);
+            showcaseView.setKeepContentBottom(false);
+            return this;
+        }
+
+        public Builder keepContentBottom() {
+            showcaseView.setKeepContentTop(false);
+            showcaseView.setKeepContentBottom(true);
             return this;
         }
 
