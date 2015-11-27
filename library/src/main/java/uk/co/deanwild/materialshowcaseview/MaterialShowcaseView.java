@@ -270,7 +270,15 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
                 radius = mShape.getHeight() / 2;
             }
 
-            if ((yPos > midPoint || mKeepContentTop) && !mKeepContentBottom) {
+            if (mKeepContentTop) {
+                mContentTopMargin = 0;
+                mContentBottomMargin = 0;
+                mGravity = Gravity.TOP;  
+            } else if (mKeepContentBottom) {
+                mContentTopMargin = 0;
+                mContentBottomMargin = 0;
+                mGravity = Gravity.BOTTOM;  
+            } else if (yPos > midPoint) {
                 // target is in lower half of screen, we'll sit above it
                 mContentTopMargin = 0;
                 mContentBottomMargin = (height - yPos) + radius + mShapePadding;
